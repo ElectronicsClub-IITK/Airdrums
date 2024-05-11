@@ -44,7 +44,9 @@ def moving_average_filter(x, n):
     Returns:
     numpy.ndarray: The filtered signal.
     """
-    y = np.convolve(x, np.ones(n)/n, mode='same')
+    y = np.zeros_like(x)
+    for i in range(n//2, len(x)-n//2):
+        y[i] = np.mean(x[i-n//2:i+n//2+1])
     return y
 
 freq = 5  # Frequency of the sine wave
