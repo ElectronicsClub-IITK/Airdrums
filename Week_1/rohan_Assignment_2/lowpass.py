@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import butter, filtfilt
+from DFT import dft
 
 def generate_noisy_sine_wave(freq, amplitude, noise_level, num_samples):
     t = np.linspace(0, 1, num_samples)
@@ -9,20 +9,21 @@ def generate_noisy_sine_wave(freq, amplitude, noise_level, num_samples):
     noisy_signal = clean_signal + noise
     return noisy_signal
 
-def apply_lowpass_filter(signal, cutoff_freq, sampling_freq, order=5):
-    # Calculate the Nyquist frequency
-    nyquist_freq = 0.5 * sampling_freq
-    
-    # Calculate the normalized cutoff frequency
-    normalized_cutoff = cutoff_freq / nyquist_freq
-    
-    # Design a Butterworth low-pass filter
-    b, a = butter(order, normalized_cutoff, btype='low', analog=False)
-    
-    # Apply the filter to the signal
-    filtered_signal = filtfilt(b, a, signal)
-    
-    return filtered_signal
+def inverse_fourier_transform(signal):
+    N = len(signal)
+    inverse_signal = np.zeros(N, dtype=np.complex128)
+    for n in range(N):
+        for k in range(N):
+            inverse_signal[n] += signal[k] * np.exp(2j * np.pi * k * n / N)
+    inverse_signal /= N
+    return inverse_signal
+
+def apply_lowpass_filter(signal):
+    fft_signal = dft(signal)
+    bandlimit_index = int(len(fft_signal)/35)
+    for i in range(bandlimit_index + 1, len(fft_signal) - bandlimit_index ):
+            fft_signal[i] = 0
+    return inverse_fourier_transform(fft_signal)
 
 # Parameters for the noisy sine wave
 frequency = 5  # Frequency of the sine wave
@@ -39,7 +40,7 @@ sampling_freq = 1000  # Sampling frequency of the signal in Hz
 order = 5  # Order of the Butterworth filter
 
 # Apply the low-pass filter
-filtered_signal = apply_lowpass_filter(noisy_signal, cutoff_freq, sampling_freq, order)
+filtered_signal = apply_lowpass_filter(noisy_signal)
 
 # Plot the original noisy signal and the filtered signal
 plt.figure(figsize=(12, 6))
