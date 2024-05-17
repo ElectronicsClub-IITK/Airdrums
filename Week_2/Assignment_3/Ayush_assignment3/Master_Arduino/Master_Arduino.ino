@@ -1,21 +1,20 @@
-int celsius = 0;
+#include <Wire.h>
 
- 
-  void setup() {
- 	pinMode(A0, INPUT);
- 
- 
-    Serial.begin(9600);
-    delay(500);
- 
-  }
- 
- 
- 
- 
-  void loop() {
- 	celsius = map(((analogRead(A0) - 20) * 3.04), 0, 1023, -40, 125);
-    Serial.write(celsius); 
-    delay(1000);
- 
-  }
+const int sensorPin = A0;
+void setup(){
+  Wire.begin(8);
+
+}
+
+void loop() {
+
+  	float celsius = map(((analogRead(A0) - 20) * 3.04), 0, 1023, -40, 125); 
+
+
+	
+  Wire.beginTransmission(8); // Transmit to device #8
+  Wire.write((int)celsius); // Send temperature as integer
+  Wire.endTransmission(); // Stop transmitting
+
+  delay(1000); // Wait for 1 second
+}
