@@ -32,5 +32,6 @@ void receiveEvent(int h){
   
   lcd.setCursor(0,0); // set the cursor
   lcd.print(celsius); // diplay the temperature on lcd
-  delay(100);
+  delay(1000);
+  lcd.clear();
 }
